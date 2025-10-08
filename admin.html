@@ -4,86 +4,192 @@
   <meta charset="UTF-8" />
   <title>Админ-панель | TBCxPayme CUP</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: radial-gradient(circle at center, #02171a, #000a0c);
+      color: #e8f8ff;
+      font-family: "Orbitron", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    #login {
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    #adminPanel {
+      display: none;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    h1 {
+      color: #00ffff;
+      text-shadow: 0 0 10px #00aaff;
+    }
+
+    .match {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid #00ffff;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input {
+      background: rgba(0, 0, 0, 0.4);
+      color: #00ffff;
+      border: 1px solid #00ffff;
+      border-radius: 5px;
+      padding: 5px;
+      margin: 3px;
+      text-align: center;
+      font-family: "Orbitron", sans-serif;
+    }
+
+    button {
+      background: #0099ff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px 0;
+      font-family: "Orbitron", sans-serif;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #00bbff;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 1em;
+      color: #00ff99;
+    }
+
+    #error {
+      color: #ff5555;
+      display: none;
+    }
+
+    #tokenInput {
+      width: 320px;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-  <div id="login-screen">
-    <h2>🔒 Вход в панель управления</h2>
-    <input type="password" id="passwordInput" placeholder="Введите пароль" />
+  <div id="login">
+    <h2>🔐 Вход в панель администратора</h2>
+    <input type="password" id="passwordInput" placeholder="Введите пароль" /><br><br>
     <button onclick="login()">Войти</button>
-    <p id="error" class="error-text">Неверный пароль</p>
+    <p id="error">Неверный пароль</p>
   </div>
 
-  <div id="adminPanel" style="display:none;">
-    <h1>Панель администратора турнира</h1>
-    <div id="matchContainer"></div>
-    <button id="saveBtn" onclick="saveData()">💾 Сохранить</button>
-    <p id="status"></p>
+  <div id="adminPanel">
+    <h1>Панель управления турниром</h1>
+
+    <label>🔑 GitHub Token:</label><br>
+    <input type="password" id="tokenInput" placeholder="Введите GitHub токен"><br>
+    <button onclick="loadData()">📂 Загрузить data.json</button>
+
+    <div id="matches"></div>
+    <button onclick="saveData()">💾 Сохранить</button>
+    <div id="status"></div>
   </div>
 
   <script>
     const PASSWORD = "TBCxPayme2025";
-    const TOKEN = "ВАШ_GITHUB_TOKEN"; // вставь сюда токен
     const REPO = "TBCxPayme/CyberSport";
-    const FILE = "data.json";
-
-    let matches = [];
+    const FILE_PATH = "data.json";
     let sha = null;
+    let matches = [];
 
-    async function login() {
-      const pass = document.getElementById("passwordInput").value;
-      if (pass === PASSWORD) {
-        document.getElementById("login-screen").style.display = "none";
+    function login() {
+      const input = document.getElementById("passwordInput").value;
+      if (input === PASSWORD) {
+        document.getElementById("login").style.display = "none";
         document.getElementById("adminPanel").style.display = "block";
-        await loadData();
       } else {
         document.getElementById("error").style.display = "block";
       }
     }
 
     async function loadData() {
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`);
-      const data = await res.json();
-      sha = data.sha;
-      matches = JSON.parse(atob(data.content)).matches;
-      renderMatches();
+      const token = document.getElementById("tokenInput").value.trim();
+      if (!token) return alert("Введите токен!");
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
+          headers: { Authorization: `token ${token}` }
+        });
+        const data = await res.json();
+        sha = data.sha;
+        const json = JSON.parse(atob(data.content));
+        matches = json.matches;
+        renderMatches();
+        document.getElementById("status").textContent = "✅ Данные загружены!";
+      } catch (err) {
+        document.getElementById("status").textContent = "❌ Ошибка загрузки данных!";
+      }
     }
 
     function renderMatches() {
-      const container = document.getElementById("matchContainer");
+      const container = document.getElementById("matches");
       container.innerHTML = "";
       matches.forEach((m, i) => {
         container.innerHTML += `
           <div class="match">
-            <input value="${m.teamA}" onchange="update(${i}, 'teamA', this.value)">
-            <input type="number" value="${m.scoreA}" onchange="update(${i}, 'scoreA', this.value)">
-            <span>vs</span>
-            <input value="${m.teamB}" onchange="update(${i}, 'teamB', this.value)">
-            <input type="number" value="${m.scoreB}" onchange="update(${i}, 'scoreB', this.value)">
+            <input value="${m.teamA}" onchange="updateMatch(${i}, 'teamA', this.value)">
+            <input type="number" value="${m.scoreA}" onchange="updateMatch(${i}, 'scoreA', this.value)">
+            <span>VS</span>
+            <input value="${m.teamB}" onchange="updateMatch(${i}, 'teamB', this.value)">
+            <input type="number" value="${m.scoreB}" onchange="updateMatch(${i}, 'scoreB', this.value)">
           </div>`;
       });
     }
 
-    function update(i, key, val) {
+    function updateMatch(i, key, val) {
       matches[i][key] = key.includes("score") ? parseInt(val) : val;
     }
 
     async function saveData() {
+      const token = document.getElementById("tokenInput").value.trim();
+      if (!token) return alert("Введите токен!");
+
       const body = {
-        message: "Update data.json",
+        message: "Обновление данных турнира",
         content: btoa(JSON.stringify({ matches }, null, 2)),
         sha
       };
 
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `token ${TOKEN}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
+          method: "PUT",
+          headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
 
-      document.getElementById("status").textContent = res.ok ? "✅ Успешно сохранено!" : "❌ Ошибка при сохранении";
+        if (res.ok) {
+          document.getElementById("status").textContent = "✅ Сохранено успешно!";
+        } else {
+          document.getElementById("status").textContent = "❌ Ошибка при сохранении!";
+        }
+      } catch {
+        document.getElementById("status").textContent = "⚠️ Сетевая ошибка!";
+      }
     }
   </script>
 </body>
