@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Админ-панель | TBCxPayme CUP</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="login-screen">
+    <h2>🔒 Вход в панель управления</h2>
+    <input type="password" id="passwordInput" placeholder="Введите пароль" />
+    <button onclick="login()">Войти</button>
+    <p id="error" class="error-text">Неверный пароль</p>
+  </div>
+
+  <div id="adminPanel" style="display:none;">
+    <h1>Панель администратора турнира</h1>
+    <div id="matchContainer"></div>
+    <button id="saveBtn" onclick="saveData()">💾 Сохранить</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const PASSWORD = "TBCxPayme2025";
+    const TOKEN = "ВАШ_GITHUB_TOKEN"; // вставь сюда токен
+    const REPO = "TBCxPayme/CyberSport";
+    const FILE = "data.json";
+
+    let matches = [];
+    let sha = null;
+
+    async function login() {
+      const pass = document.getElementById("passwordInput").value;
+      if (pass === PASSWORD) {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        await loadData();
+      } else {
+        document.getElementById("error").style.display = "block";
+      }
+    }
+
+    async function loadData() {
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`);
+      const data = await res.json();
+      sha = data.sha;
+      matches = JSON.parse(atob(data.content)).matches;
+      renderMatches();
+    }
+
+    function renderMatches() {
+      const container = document.getElementById("matchContainer");
+      container.innerHTML = "";
+      matches.forEach((m, i) => {
+        container.innerHTML += `
+          <div class="match">
+            <input value="${m.teamA}" onchange="update(${i}, 'teamA', this.value)">
+            <input type="number" value="${m.scoreA}" onchange="update(${i}, 'scoreA', this.value)">
+            <span>vs</span>
+            <input value="${m.teamB}" onchange="update(${i}, 'teamB', this.value)">
+            <input type="number" value="${m.scoreB}" onchange="update(${i}, 'scoreB', this.value)">
+          </div>`;
+      });
+    }
+
+    function update(i, key, val) {
+      matches[i][key] = key.includes("score") ? parseInt(val) : val;
+    }
+
+    async function saveData() {
+      const body = {
+        message: "Update data.json",
+        content: btoa(JSON.stringify({ matches }, null, 2)),
+        sha
+      };
+
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      document.getElementById("status").textContent = res.ok ? "✅ Успешно сохранено!" : "❌ Ошибка при сохранении";
+    }
+  </script>
+</body>
+</html>
