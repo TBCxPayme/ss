@@ -1,33 +1,50 @@
 async function loadData() {
-  const res = await fetch("data.json?nocache=" + new Date().getTime());
-  const data = await res.json();
-  const container = document.getElementById("tournament");
-  container.innerHTML = "";
+  try {
+    const res = await fetch("data.json");
+    const data = await res.json();
+    renderRounds(data.rounds);
+  } catch (err) {
+    bracketEl.innerHTML = "<p>Ошибка загрузки данных</p>";
+  }
+}
 
-  data.matches.forEach((m, i) => {
-    const div = document.createElement("div");
-    div.className = "match";
-    div.innerHTML = `
-      <div class="team ${m.scoreA > m.scoreB ? 'winner' : ''}">
-        ${m.teamA} <span>${m.scoreA}</span>
-      </div>
-      <div class="team ${m.scoreB > m.scoreA ? 'winner' : ''}">
-        ${m.teamB} <span>${m.scoreB}</span>
-      </div>`;
-    container.appendChild(div);
+function renderRounds(rounds) {
+  bracketEl.innerHTML = "";
+
+  rounds.forEach((round) => {
+    const roundDiv = document.createElement("div");
+    roundDiv.classList.add("round");
+
+    const title = document.createElement("h3");
+    title.textContent = round.name;
+    title.style.textAlign = "center";
+    title.style.color = "#00eaff";
+    roundDiv.appendChild(title);
+
+    round.matches.forEach((match) => {
+      const matchDiv = document.createElement("div");
+      matchDiv.classList.add("match");
+      matchDiv.innerHTML = `
+        <div class="team">${match.teamA} <span>${match.scoreA}</span></div>
+        <div class="team">${match.teamB} <span>${match.scoreB}</span></div>
+      `;
+      roundDiv.appendChild(matchDiv);
+    });
+
+    bracketEl.appendChild(roundDiv);
   });
 
-  const finalMatch = data.matches[data.matches.length - 1];
-  let champion = null;
-  if (finalMatch.scoreA > finalMatch.scoreB) champion = finalMatch.teamA;
-  else if (finalMatch.scoreB > finalMatch.scoreA) champion = finalMatch.teamB;
-  if (champion) showWinner(champion);
-}
+  const finalRound = rounds[rounds.length - 1];
+  const finalMatch = finalRound.matches[0];
+  const winner =
+    finalMatch.scoreA > finalMatch.scoreB
+      ? finalMatch.teamA
+      : finalMatch.scoreB > finalMatch.scoreA
+      ? finalMatch.teamB
+      : null;
 
-function showWinner(name) {
-  const el = document.getElementById("winner");
-  el.textContent = `🏆 ${name}`;
-  el.classList.add("winner-title");
+  if (winner) {
+    titleEl.innerHTML = `${winner} 🏆`;
+    titleEl.classList.add("gold");
+  }
 }
-
-loadData();
