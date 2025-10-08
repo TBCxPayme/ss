@@ -1,196 +1,91 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Админ-панель | TBCxPayme CUP</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      background: radial-gradient(circle at center, #02171a, #000a0c);
-      color: #e8f8ff;
-      font-family: "Orbitron", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px;
-    }
-
-    #login {
-      text-align: center;
-      margin-top: 100px;
-    }
-
-    #adminPanel {
-      display: none;
-      width: 90%;
-      max-width: 800px;
-    }
-
-    h1 {
-      color: #00ffff;
-      text-shadow: 0 0 10px #00aaff;
-    }
-
-    .match {
-      background: rgba(0, 255, 255, 0.05);
-      border: 1px solid #00ffff;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    input {
-      background: rgba(0, 0, 0, 0.4);
-      color: #00ffff;
-      border: 1px solid #00ffff;
-      border-radius: 5px;
-      padding: 5px;
-      margin: 3px;
-      text-align: center;
-      font-family: "Orbitron", sans-serif;
-    }
-
-    button {
-      background: #0099ff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin: 10px 0;
-      font-family: "Orbitron", sans-serif;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #00bbff;
-    }
-
-    #status {
-      margin-top: 10px;
-      font-size: 1em;
-      color: #00ff99;
-    }
-
-    #error {
-      color: #ff5555;
-      display: none;
-    }
-
-    #tokenInput {
-      width: 320px;
-      margin-bottom: 10px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель управления — TBCxPayme CUP</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div id="login">
-    <h2>🔐 Вход в панель администратора</h2>
-    <input type="password" id="passwordInput" placeholder="Введите пароль" /><br><br>
-    <button onclick="login()">Войти</button>
-    <p id="error">Неверный пароль</p>
-  </div>
-
-  <div id="adminPanel">
+<body class="admin-body">
+  <div class="admin-container">
     <h1>Панель управления турниром</h1>
-
-    <label>🔑 GitHub Token:</label><br>
-    <input type="password" id="tokenInput" placeholder="Введите GitHub токен"><br>
-    <button onclick="loadData()">📂 Загрузить data.json</button>
-
-    <div id="matches"></div>
-    <button onclick="saveData()">💾 Сохранить</button>
-    <div id="status"></div>
+    <button id="saveBtn">💾 Сохранить изменения</button>
+    <div id="adminBracket"></div>
   </div>
 
   <script>
-    const PASSWORD = "TBCxPayme2025";
-    const REPO = "TBCxPayme/CyberSport";
-    const FILE_PATH = "data.json";
-    let sha = null;
-    let matches = [];
-
-    function login() {
-      const input = document.getElementById("passwordInput").value;
-      if (input === PASSWORD) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("adminPanel").style.display = "block";
-      } else {
-        document.getElementById("error").style.display = "block";
-      }
-    }
+    const adminBracket = document.getElementById("adminBracket");
+    const saveBtn = document.getElementById("saveBtn");
+    let data;
 
     async function loadData() {
-      const token = document.getElementById("tokenInput").value.trim();
-      if (!token) return alert("Введите токен!");
-
-      try {
-        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-          headers: { Authorization: `token ${token}` }
-        });
-        const data = await res.json();
-        sha = data.sha;
-        const json = JSON.parse(atob(data.content));
-        matches = json.matches;
-        renderMatches();
-        document.getElementById("status").textContent = "✅ Данные загружены!";
-      } catch (err) {
-        document.getElementById("status").textContent = "❌ Ошибка загрузки данных!";
-      }
+      const res = await fetch("data.json");
+      data = await res.json();
+      renderAdmin(data.rounds);
     }
 
-    function renderMatches() {
-      const container = document.getElementById("matches");
-      container.innerHTML = "";
-      matches.forEach((m, i) => {
-        container.innerHTML += `
-          <div class="match">
-            <input value="${m.teamA}" onchange="updateMatch(${i}, 'teamA', this.value)">
-            <input type="number" value="${m.scoreA}" onchange="updateMatch(${i}, 'scoreA', this.value)">
-            <span>VS</span>
-            <input value="${m.teamB}" onchange="updateMatch(${i}, 'teamB', this.value)">
-            <input type="number" value="${m.scoreB}" onchange="updateMatch(${i}, 'scoreB', this.value)">
-          </div>`;
+    function renderAdmin(rounds) {
+      adminBracket.innerHTML = "";
+      rounds.forEach((round, rIndex) => {
+        const roundDiv = document.createElement("div");
+        roundDiv.classList.add("round");
+        const title = document.createElement("h3");
+        title.textContent = round.name;
+        roundDiv.appendChild(title);
+
+        round.matches.forEach((match, mIndex) => {
+          const matchDiv = document.createElement("div");
+          matchDiv.classList.add("match");
+          matchDiv.innerHTML = `
+            <input class="team-input" value="${match.teamA}">
+            <input class="score-input" type="number" value="${match.scoreA}">
+            <span>vs</span>
+            <input class="team-input" value="${match.teamB}">
+            <input class="score-input" type="number" value="${match.scoreB}">
+          `;
+          const inputs = matchDiv.querySelectorAll("input");
+          inputs.forEach((inp, i) => {
+            inp.addEventListener("change", () => {
+              if (i === 0) match.teamA = inp.value;
+              if (i === 1) match.scoreA = parseInt(inp.value);
+              if (i === 2) match.teamB = inp.value;
+              if (i === 3) match.scoreB = parseInt(inp.value);
+            });
+          });
+          roundDiv.appendChild(matchDiv);
+        });
+        adminBracket.appendChild(roundDiv);
       });
     }
 
-    function updateMatch(i, key, val) {
-      matches[i][key] = key.includes("score") ? parseInt(val) : val;
-    }
+    saveBtn.addEventListener("click", async () => {
+      const token = prompt("Введите GitHub Token:");
+      const username = "TBCxPayme";
+      const repo = "CyberSport";
+      const path = "data.json";
+      const url = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
+      const content = btoa(JSON.stringify(data, null, 2));
 
-    async function saveData() {
-      const token = document.getElementById("tokenInput").value.trim();
-      if (!token) return alert("Введите токен!");
+      const res = await fetch(url);
+      const file = await res.json();
 
-      const body = {
-        message: "Обновление данных турнира",
-        content: btoa(JSON.stringify({ matches }, null, 2)),
-        sha
-      };
+      await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Обновление data.json через админку",
+          content: content,
+          sha: file.sha
+        })
+      });
 
-      try {
-        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-          method: "PUT",
-          headers: {
-            Authorization: `token ${token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
+      alert("✅ Успешно сохранено!");
+    });
 
-        if (res.ok) {
-          document.getElementById("status").textContent = "✅ Сохранено успешно!";
-        } else {
-          document.getElementById("status").textContent = "❌ Ошибка при сохранении!";
-        }
-      } catch {
-        document.getElementById("status").textContent = "⚠️ Сетевая ошибка!";
-      }
-    }
+    loadData();
   </script>
 </body>
 </html>
