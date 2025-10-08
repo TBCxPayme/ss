@@ -1,10 +1,76 @@
 {
-  "matches": [
-    {"teamA": "Team 1", "teamB": "Team 2", "scoreA": 0, "scoreB": 0},
-    {"teamA": "Team 3", "teamB": "Team 4", "scoreA": 0, "scoreB": 0},
-    {"teamA": "Team 5", "teamB": "Team 6", "scoreA": 0, "scoreB": 0},
-    {"teamA": "Team 7", "teamB": "Team 8", "scoreA": 0, "scoreB": 0},
-    {"teamA": "Team 9", "teamB": "Team 10", "scoreA": 0, "scoreB": 0},
-    {"teamA": "Team 11", "teamB": "Team 12", "scoreA": 0, "scoreB": 0}
+  "rounds": [
+    {
+      "matches": [
+        {
+          "teamA": "Davron",
+          "teamB": "shox",
+          "scoreA": 1,
+          "scoreB": 2
+        },
+        {
+          "teamA": "Jahon",
+          "teamB": "Sarvar",
+          "scoreA": 1,
+          "scoreB": 3
+        },
+        {
+          "teamA": "Kamol",
+          "teamB": "Samad",
+          "scoreA": 2,
+          "scoreB": 0
+        },
+        {
+          "teamA": "Team 7",
+          "teamB": "Team 8",
+          "scoreA": 0,
+          "scoreB": 0
+        },
+        {
+          "teamA": "Team 9",
+          "teamB": "Team 10",
+          "scoreA": 0,
+          "scoreB": 0
+        },
+        {
+          "teamA": "Team 11",
+          "teamB": "Team 12",
+          "scoreA": 0,
+          "scoreB": 0
+        }
+      ]
+    },
+    {
+      "matches": [
+        {
+          "teamA": "Winner 1",
+          "teamB": "Winner 2",
+          "scoreA": 0,
+          "scoreB": 0
+        },
+        {
+          "teamA": "Winner 3",
+          "teamB": "Winner 4",
+          "scoreA": 0,
+          "scoreB": 0
+        },
+        {
+          "teamA": "Winner 5",
+          "teamB": "Winner 6",
+          "scoreA": 0,
+          "scoreB": 0
+        }
+      ]
+    },
+    {
+      "matches": [
+        {
+          "teamA": "Davron",
+          "teamB": "Samad",
+          "scoreA": 3,
+          "scoreB": 1
+        }
+      ]
+    }
   ]
 }
