@@ -1,15 +1,13 @@
 async function loadData() {
-  try {
-    const res = await fetch("data.json");
-    const data = await res.json();
-    renderRounds(data.rounds);
-  } catch (err) {
-    bracketEl.innerHTML = "<p>Ошибка загрузки данных</p>";
-  }
+  const res = await fetch("data.json");
+  const data = await res.json();
+  renderBracket(data.rounds);
 }
 
-function renderRounds(rounds) {
-  bracketEl.innerHTML = "";
+function renderBracket(rounds) {
+  const bracket = document.getElementById("bracket");
+  const championDisplay = document.getElementById("champion");
+  bracket.innerHTML = "";
 
   rounds.forEach((round) => {
     const roundDiv = document.createElement("div");
@@ -17,34 +15,30 @@ function renderRounds(rounds) {
 
     const title = document.createElement("h3");
     title.textContent = round.name;
-    title.style.textAlign = "center";
-    title.style.color = "#00eaff";
     roundDiv.appendChild(title);
 
     round.matches.forEach((match) => {
       const matchDiv = document.createElement("div");
       matchDiv.classList.add("match");
-      matchDiv.innerHTML = `
-        <div class="team">${match.teamA} <span>${match.scoreA}</span></div>
-        <div class="team">${match.teamB} <span>${match.scoreB}</span></div>
-      `;
+
+      const teamA = document.createElement("div");
+      const teamB = document.createElement("div");
+      teamA.classList.add("team");
+      teamB.classList.add("team");
+
+      const winner = match.scoreA > match.scoreB ? match.teamA : match.teamB;
+      if (round.name === "Финал") championDisplay.innerHTML = `🏆 ${winner}`;
+
+      teamA.textContent = `${match.teamA} (${match.scoreA})`;
+      teamB.textContent = `${match.teamB} (${match.scoreB})`;
+
+      matchDiv.appendChild(teamA);
+      matchDiv.appendChild(teamB);
       roundDiv.appendChild(matchDiv);
     });
 
-    bracketEl.appendChild(roundDiv);
+    bracket.appendChild(roundDiv);
   });
-
-  const finalRound = rounds[rounds.length - 1];
-  const finalMatch = finalRound.matches[0];
-  const winner =
-    finalMatch.scoreA > finalMatch.scoreB
-      ? finalMatch.teamA
-      : finalMatch.scoreB > finalMatch.scoreA
-      ? finalMatch.teamB
-      : null;
-
-  if (winner) {
-    titleEl.innerHTML = `${winner} 🏆`;
-    titleEl.classList.add("gold");
-  }
 }
+
+loadData();
