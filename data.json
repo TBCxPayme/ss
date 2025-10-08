@@ -3,26 +3,26 @@
     {
       "name": "Раунд 1",
       "matches": [
-        { "teamA": "Team 1", "scoreA": 0, "teamB": "Team 2", "scoreB": 0 },
-        { "teamA": "Team 3", "scoreA": 0, "teamB": "Team 4", "scoreB": 0 },
-        { "teamA": "Team 5", "scoreA": 0, "teamB": "Team 6", "scoreB": 0 },
-        { "teamA": "Team 7", "scoreA": 0, "teamB": "Team 8", "scoreB": 0 },
-        { "teamA": "Team 9", "scoreA": 0, "teamB": "Team 10", "scoreB": 0 },
-        { "teamA": "Team 11", "scoreA": 0, "teamB": "Team 12", "scoreB": 0 }
+        {"teamA": "Team 1", "scoreA": 0, "teamB": "Team 2", "scoreB": 0},
+        {"teamA": "Team 3", "scoreA": 0, "teamB": "Team 4", "scoreB": 0},
+        {"teamA": "Team 5", "scoreA": 0, "teamB": "Team 6", "scoreB": 0},
+        {"teamA": "Team 7", "scoreA": 0, "teamB": "Team 8", "scoreB": 0},
+        {"teamA": "Team 9", "scoreA": 0, "teamB": "Team 10", "scoreB": 0},
+        {"teamA": "Team 11", "scoreA": 0, "teamB": "Team 12", "scoreB": 0}
       ]
     },
     {
       "name": "Раунд 2",
       "matches": [
-        { "teamA": "Победитель 1", "scoreA": 0, "teamB": "Победитель 2", "scoreB": 0 },
-        { "teamA": "Победитель 3", "scoreA": 0, "teamB": "Победитель 4", "scoreB": 0 },
-        { "teamA": "Победитель 5", "scoreA": 0, "teamB": "Победитель 6", "scoreB": 0 }
+        {"teamA": "Победитель 1", "scoreA": 0, "teamB": "Победитель 2", "scoreB": 0},
+        {"teamA": "Победитель 3", "scoreA": 0, "teamB": "Победитель 4", "scoreB": 0},
+        {"teamA": "Победитель 5", "scoreA": 0, "teamB": "Победитель 6", "scoreB": 0}
       ]
     },
     {
       "name": "Финал",
       "matches": [
-        { "teamA": "Победитель Раунда 2-1", "scoreA": 0, "teamB": "Победитель Раунда 2-2", "scoreB": 0 }
+        {"teamA": "Финалист 1", "scoreA": 0, "teamB": "Финалист 2", "scoreB": 0}
       ]
     }
   ]
