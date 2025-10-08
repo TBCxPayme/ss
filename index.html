@@ -1,22 +1,76 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TBCxPayme CUP</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>TBCxPayme CUP <span id="winner" class="winner-title"></span></h1>
+    <h1 id="title">TBCxPayme CUP</h1>
+    <a href="admin.html" class="admin-link">Вход для администратора</a>
   </header>
 
   <main>
-    <div class="tournament" id="tournament"></div>
+    <div id="bracket" class="bracket"></div>
   </main>
 
-  <footer>
-    <p>© 2025 TBCxPayme Esports</p>
-  </footer>
+  <script>
+    const bracketEl = document.getElementById("bracket");
+    const titleEl = document.getElementById("title");
+
+    async function loadData() {
+      try {
+        const res = await fetch("data.json");
+        const data = await res.json();
+        renderRounds(data.rounds);
+      } catch (err) {
+        bracketEl.innerHTML = "<p>Ошибка загрузки данных</p>";
+      }
+    }
+
+    function renderRounds(rounds) {
+      bracketEl.innerHTML = "";
+
+      rounds.forEach((round) => {
+        const roundDiv = document.createElement("div");
+        roundDiv.classList.add("round");
+
+        const title = document.createElement("h3");
+        title.textContent = round.name;
+        title.classList.add("round-title");
+        roundDiv.appendChild(title);
+
+        round.matches.forEach((match) => {
+          const matchDiv = document.createElement("div");
+          matchDiv.classList.add("match");
+          matchDiv.innerHTML = `
+            <div class="team">${match.teamA} <span>${match.scoreA}</span></div>
+            <div class="team">${match.teamB} <span>${match.scoreB}</span></div>
+          `;
+          roundDiv.appendChild(matchDiv);
+        });
+
+        bracketEl.appendChild(roundDiv);
+      });
+
+      // Отображение победителя
+      const finalRound = rounds[rounds.length - 1];
+      const finalMatch = finalRound.matches[0];
+      const winner =
+        finalMatch.scoreA > finalMatch.scoreB
+          ? finalMatch.teamA
+          : finalMatch.scoreB > finalMatch.scoreA
+          ? finalMatch.teamB
+          : null;
+
+      if (winner) {
+        titleEl.innerHTML = `TBCxPayme CUP — <span class="winner-name">${winner} 🏆</span>`;
+      }
+    }
+
+    loadData();
+  </script>
 </body>
 </html>
