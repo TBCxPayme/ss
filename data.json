@@ -1,0 +1,10 @@
+{
+  "matches": [
+    {"teamA": "Team 1", "teamB": "Team 2", "scoreA": 0, "scoreB": 0},
+    {"teamA": "Team 3", "teamB": "Team 4", "scoreA": 0, "scoreB": 0},
+    {"teamA": "Team 5", "teamB": "Team 6", "scoreA": 0, "scoreB": 0},
+    {"teamA": "Team 7", "teamB": "Team 8", "scoreA": 0, "scoreB": 0},
+    {"teamA": "Team 9", "teamB": "Team 10", "scoreA": 0, "scoreB": 0},
+    {"teamA": "Team 11", "teamB": "Team 12", "scoreA": 0, "scoreB": 0}
+  ]
+}
